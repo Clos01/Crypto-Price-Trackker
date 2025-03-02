@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 // import { getTokenPrices, getAssetPlatforms } from '../api/simpleApi';
 import type { TokenPriceParams, TokenPriceResult } from '../types/coingecko';
-import { COINGECKO_CONFIG } from '../config/coingecko';
+import { COINGECKO_CONFIG } from '@/lib/config/coingecko';
 
 // Query keys for React Query cache management
 export const cryptoKeys = {
