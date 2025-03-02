@@ -1,6 +1,5 @@
 "use client"
 
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ArrowDown, ArrowUp, ChevronDown, Info } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,13 +8,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCoinData } from "@/lib/hooks/use-coin-data";
 import { useState } from "react"
+import { AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Area } from "recharts";
 
 interface ChartProps {
   data: { date: string; price: number }[];
   isPositive: boolean;
 }
 // Custom tooltip component
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background border rounded-lg shadow-sm p-3">
@@ -57,7 +57,7 @@ const Chart = ({ data, isPositive }: ChartProps) => {
           axisLine={false}
           tickLine={false}
           tick={{ fontSize: 12 }}
-          tickFormatter={(value) => {
+          tickFormatter={(value: string) => {
             return value.split("-")[2] // Just the day
           }}
           minTickGap={30}
@@ -67,7 +67,7 @@ const Chart = ({ data, isPositive }: ChartProps) => {
           axisLine={false}
           tickLine={false}
           tick={{ fontSize: 12 }}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value: number) => `$${value}`}
           width={60}
         />
         <Tooltip content={<CustomTooltip />} />
@@ -198,7 +198,7 @@ export function CoinChart({coinId}: CoinChartProps) {
           />
           <Tabs
             defaultValue={timeRange}
-            onValueChange={(value) => setTimeRange(value)}
+            onValueChange={(value: string) => setTimeRange(value)}
             className="w-full sm:w-auto"
           >
             <TabsList className="grid grid-cols-2 w-full sm:w-auto">
