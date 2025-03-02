@@ -1,14 +1,14 @@
 // Get API key from environment variable
-const API_KEY = process.env.COINGECKO_API_KEY;
+const API_KEY = process.env.NEXT_PUBLIC_COINGECKO_API_KEY;
 
 if (!API_KEY) {
-    throw new Error('COINGECKO_API_KEY environment variable is required');
+    console.warn('COINGECKO_API_KEY environment variable is not set');
 }
 
 export const COINGECKO_CONFIG = {
+  apiKey: API_KEY || '',
   // API Configuration
   API_URL: 'https://api.coingecko.com/api/v3',
-  API_KEY,
   
   // Default Settings
   DEFAULT_PLATFORM_ID: 'ethereum', // Default blockchain platform

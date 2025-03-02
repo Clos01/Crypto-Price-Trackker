@@ -14,7 +14,10 @@ export function usePopularTokenPrices(currencies: string[], enabled: boolean = t
         const currenciesStr = currencies.join(',');
 
         const response = await fetch(
-          `${COINGECKO_CONFIG.API_URL}/simple/token_price/ethereum?contract_addresses=${contractAddresses}&vs_currencies=${currenciesStr}`
+          `${COINGECKO_CONFIG.API_URL}/simple/token_price/ethereum?contract_addresses=${contractAddresses}&vs_currencies=${currenciesStr}`,
+          {
+            headers: COINGECKO_CONFIG.DEFAULT_HEADERS,
+          }
         );
 
         if (response.status === 429) {

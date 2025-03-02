@@ -1,37 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { COINGECKO_SEARCH_API_CONFIG } from '@/lib/config/coingeckoSearch';
-import { CoinGeckoSearchResponse } from '@/lib/api/searchApi';
+
+const API_KEY = process.env.NEXT_PUBLIC_COINGECKO_API_KEY;
+
+export const COINGECKO_SEARCH_API_CONFIG = {
+  baseUrl: 'https://api.coingecko.com/api/v3',
+  headers: {
+    'Accept': 'application/json',
+    'x-cg-api-key': API_KEY || ''
+  }
+};
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get('query');
-
-  if (!query) {
-    return NextResponse.json({ error: 'Missing query parameter' }, { status: 400 });
-  }
-
-  const url = `${COINGECKO_SEARCH_API_CONFIG.API_URL}?query=${encodeURIComponent(query)}`;
-
   try {
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'x-cg-api-key': COINGECKO_SEARCH_API_CONFIG.API_KEY,
-      }
-    });
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get('query');
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("CoinGecko Search API Error:", errorData);
-      return NextResponse.json({ error: `CoinGecko API Error: ${response.status} - ${errorData.error || 'Unknown error'}` }, { status: response.status });
+    if (!query) {
+      return NextResponse.json({ error: 'Query parameter is required' }, { status: 400 });
     }
 
-    const data: CoinGeckoSearchResponse = await response.json();
-    return NextResponse.json(data.coins); // Returns only the coins array
+    const response = await fetch(
+      `${COINGECKO_SEARCH_API_CONFIG.baseUrl}/search?query=${encodeURIComponent(query)}`,
+      { headers: COINGECKO_SEARCH_API_CONFIG.headers }
+    );
 
-  } catch (error: any) {
-    console.error("API Request Error:", error);
-    return NextResponse.json({ error: `Failed to fetch search results: ${error.message || 'Unknown error'}` }, { status: 500 });
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: 'Failed to fetch from CoinGecko API' },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+    
+  } catch (error) {
+    console.error('Search API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
