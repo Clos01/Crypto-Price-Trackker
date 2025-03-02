@@ -1,31 +1,42 @@
 'use client';
-
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePopularTokenPrices } from "@/lib/hooks/use-crypto";
 import { COINGECKO_CONFIG, type TokenSymbol } from "@/lib/config/coingecko";
 
 export function CryptoGallery() {
   const { data: prices, isLoading, error } = usePopularTokenPrices(['usd'], true);
+  const [retrying, setRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    await refetch();
+    setRetrying(false);
+  };
 
   if (isLoading) {
-    return (
-      <div className="grid place-items-center">
-        <p>Loading...</p>
-      </div>
-    );
+    return <div className="text-center">Loading...</div>;
   }
 
   if (error) {
     return (
-      <div className="grid place-items-center">
-        <p className="text-red-500">Error: {error.message}</p>
-      </div>
+      <Alert variant="destructive" className="mb-4">
+        <AlertDescription>
+          {error.message}
+          {error.message.includes('Rate limit') && (
+            <button 
+              onClick={handleRetry}
+              disabled={retrying}
+              className="ml-2 underline"
+            >
+              {retrying ? 'Retrying...' : 'Retry'}
+            </button>
+          )}
+        </AlertDescription>
+      </Alert>
     );
   }
 
-  if (!prices || Object.keys(prices).length === 0) {
-    return <p>No price data available.</p>;
-  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -36,6 +36,6 @@ export function usePopularTokenPrices(currencies: string[], enabled: boolean = t
     retryDelay: 10000, // ⏳ Wait 10 sec before each retry
     cacheTime: CACHE_TIME, // ⏳ Store API data for 15 minutes
     staleTime: STALE_TIME, // 🔄 Avoid unnecessary refetching for 5 minutes
-    refetchInterval: REFRESH_INTERVAL, // 🔄 Refresh in the background every 1 min
+    refetchInterval: REFRESH_INTERVAL, // 🔄 Refresh in the background every 2 min
   });
 }
