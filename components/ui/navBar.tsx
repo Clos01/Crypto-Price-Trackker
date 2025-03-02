@@ -1,23 +1,18 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
-import { useState } from "react"
 import Link from "next/link"
 import { Menu, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useSearch } from "@/lib/hooks/use-search"
 
 export function Navbar() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const { searchQuery, setSearchQuery, results, loading, error, handleSearch } = useSearch();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Searching for:", searchQuery)
-    // Implement your search functionality here
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -44,7 +39,10 @@ export function Navbar() {
 
         {/* Search Bar - Grows on larger screens, hidden on mobile */}
         <div className="hidden md:flex flex-1 items-center justify-end">
-          <form onSubmit={handleSearch} className="w-full max-w-sm lg:max-w-md xl:max-w-lg">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch(searchQuery);
+          }} className="w-full max-w-sm lg:max-w-md xl:max-w-lg">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -53,6 +51,11 @@ export function Navbar() {
                 className="w-full bg-background pl-8 md:w-[300px] lg:w-[400px]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === 'Enter') {
+                    handleSearch(searchQuery);
+                  }
+                }}
               />
             </div>
           </form>
@@ -68,7 +71,10 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="top" className="pt-16">
-              <form onSubmit={handleSearch} className="w-full">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch(searchQuery);
+              }} className="w-full">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -77,6 +83,11 @@ export function Navbar() {
                     className="w-full bg-background pl-8"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                      if (e.key === 'Enter') {
+                        handleSearch(searchQuery);
+                      }
+                    }}
                   />
                 </div>
               </form>
@@ -109,6 +120,17 @@ export function Navbar() {
           </Sheet>
         </div>
       </div>
+    {/* Basic Search Results Display */}
+      {results.length > 0 && (
+        <div className="container mt-4">
+          <h2 className="text-lg font-semibold">Search Results</h2>
+          <ul>
+            {results.map((result) => (
+              <li key={result.id}>{result.name} ({result.symbol})</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </header>
   )
 }
