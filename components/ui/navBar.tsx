@@ -121,12 +121,18 @@ export function Navbar() {
         </div>
       </div>
     {/* Basic Search Results Display */}
+import Link from 'next/link';
+
       {results.length > 0 && (
         <div className="container mt-4">
           <h2 className="text-lg font-semibold">Search Results</h2>
           <ul>
             {results.map((result) => (
-              <li key={result.id}>{result.name} ({result.symbol})</li>
+              <li key={result.id}>
+                <Link href={`/coins/${result.id}`}>
+                  {result.name} ({result.symbol})
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
