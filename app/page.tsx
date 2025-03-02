@@ -22,15 +22,16 @@ export default function Home() {
     <main className="flex-1 container py-8 p-10">
       <h1 className="text-3xl font-bold mb-6">Keep Track of Crypto Prices</h1>
       <p className="text-lg text-muted-foreground">
-        See Default values below to see 
+        See Default values below to see
       </p>
       <CryptoGallery />
-{/*   
+
+{/*
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
            <Card className="w-full sm:w-[350px]">
            <CardHeader>
             <CardTitle>Crypto Prices</CardTitle>
-           <CardDescription>Popular cryptocurrency prices from CoinGecko.</CardDescription>
+            <CardDescription>Popular cryptocurrency prices from CoinGecko.</CardDescription>
           </CardHeader>
           <CardContent>
            {isLoading ? (
