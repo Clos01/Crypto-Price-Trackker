@@ -7,6 +7,11 @@ import { usePopularTokenPrices } from "../lib/hooks/use-crypto";
 import { COINGECKO_CONFIG, type TokenSymbol } from "../lib/config/coingecko";
 import Footer from "@/components/ui/footer";
 import { Navbar } from "@/components/ui/navBar";
+
+import { CryptoGallery }from "@/components/Gallery/CryptoGallery";
+
+
+
 export default function Home() {
   const { data: prices, isLoading, error, refetch } = usePopularTokenPrices(['usd'], true);
 
@@ -19,7 +24,8 @@ export default function Home() {
       <p className="text-lg text-muted-foreground">
         See Default values below to see 
       </p>
-  
+      <CryptoGallery />
+{/*   
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
            <Card className="w-full sm:w-[350px]">
            <CardHeader>
@@ -62,7 +68,7 @@ export default function Home() {
             <Button onClick={() => refetch()}>Refresh</Button>
           </CardFooter>
         </Card>
-      </div>
+      </div> */}
     </main>
     </div>
   );
