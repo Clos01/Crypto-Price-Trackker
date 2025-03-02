@@ -2,10 +2,10 @@
 // services/coingecko.ts
 import { CoinGeckoSearchResponse } from '@/lib/api/searchApi';
 
-const API_KEY = process.env.NEXT_PUBLIC_COINGECKO_API_KEY;
+const API_KEY = process.env.COINGECKO_API_KEY;
 
 if (!API_KEY) {
-  throw new Error('NEXT_PUBLIC_COINGECKO_API_KEY environment variable is required');
+  throw new Error('COINGECKO_API_KEY environment variable is required');
 }
 
 export const COINGECKO_SEARCH_API_CONFIG = {
