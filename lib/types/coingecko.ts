@@ -1,6 +1,6 @@
 export interface TokenPriceParams {
   platformId: string;
-  contractAddresses: string[];
+  contractAddress: string; 
   vsCurrencies: string[];
   includeMarketCap?: boolean;
   include24hrVol?: boolean;
