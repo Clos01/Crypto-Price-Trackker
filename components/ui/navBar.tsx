@@ -23,16 +23,14 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex items-center md:mr-6">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 transition-colors hover:text-foreground/80">
             <span className="text-xl font-bold">crypto</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link href="/" className="transition-colors hover:text-foreground/80">
-            Home
-          </Link>
+     
           <Link href="/products" className="transition-colors hover:text-foreground/80">
             Products
           </Link>
