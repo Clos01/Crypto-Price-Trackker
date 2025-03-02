@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { getTokenPrices, getAssetPlatforms } from '../api/coingecko';
-import type { TokenPriceParams } from '../types/coingecko';
+import { getTokenPrices, getAssetPlatforms } from '../api/simpleApi';
+import type { TokenPriceParams, TokenPriceResult } from '../types/coingecko';
 import { COINGECKO_CONFIG } from '../config/coingecko';
 
 // Query keys for React Query cache management
@@ -17,44 +17,56 @@ export const cryptoKeys = {
  * @param params - Parameters for token price request
  */
 export function useTokenPrices(params: TokenPriceParams) {
-  return useQuery({
-    queryKey: cryptoKeys.tokenPrices(params),
-    queryFn: () => getTokenPrices(params),
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    enabled: params.contractAddresses.length > 0, // Only fetch if we have addresses to query
-  });
+    return useQuery({
+        queryKey: cryptoKeys.tokenPrices(params),
+        queryFn: () => getTokenPrices(params),
+        refetchInterval: 60 * 1000, // Refetch every 60 seconds
+        enabled: !!params.contractAddress, // Only fetch if we have an address
+    });
 }
 
+
 /**
- * Hook to fetch popular token prices
- * @param vsCurrencies - Array of currencies to fetch prices in (default: ['usd'])
- * @param includeExtendedData - Whether to include market cap, volume, etc.
+ * Hook to fetch popular token prices, modified for single-address API
  */
 export function usePopularTokenPrices(
-  vsCurrencies: string[] = ['usd'],
+  vsCurrencies: string[] = [COINGECKO_CONFIG.DEFAULT_VS_CURRENCY],
   includeExtendedData = false
 ) {
-  const addresses = Object.values(COINGECKO_CONFIG.POPULAR_TOKEN_ADDRESSES);
-  
-  return useTokenPrices({
-    platformId: COINGECKO_CONFIG.DEFAULT_PLATFORM_ID,
-    contractAddresses: addresses,
-    vsCurrencies,
-    includeMarketCap: includeExtendedData,
-    include24hrVol: includeExtendedData,
-    include24hrChange: includeExtendedData,
-    includeLastUpdatedAt: includeExtendedData,
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['popularTokenPrices', vsCurrencies, includeExtendedData],
+    queryFn: async () => {
+      const results: { [token: string]: TokenPriceResult } = {};
+      const tokens = Object.entries(COINGECKO_CONFIG.POPULAR_TOKEN_ADDRESSES);
+
+      // Use Promise.all to fetch prices concurrently, with a small delay
+      await Promise.all(
+        tokens.map(async ([token, contractAddress], index) => {
+          // Introduce a small delay between requests to avoid rate limits
+          await new Promise((resolve) => setTimeout(resolve, index * 100)); // 100ms delay
+
+          try {
+            const priceData = await getTokenPrices({
+              platformId: COINGECKO_CONFIG.DEFAULT_PLATFORM_ID,
+              contractAddress,
+              vsCurrencies,
+              includeMarketCap: includeExtendedData,
+              include24hrVol: includeExtendedData,
+              include24hrChange: includeExtendedData,
+              includeLastUpdatedAt: includeExtendedData,
+            });
+            results[token] = priceData;
+          } catch (err) {
+            console.error(`Failed to fetch price for ${token}:`, err);
+            // Don't re-throw, allow other requests to complete
+          }
+        })
+      );
+      return results;
+    },
+    refetchInterval: 60 * 1000,
   });
+
+    return { data, isLoading, error, refetch };
 }
 
-/**
- * Hook to fetch supported asset platforms
- * @param filter - Optional filter for platforms
- */
-export function useAssetPlatforms(filter?: string) {
-  return useQuery({
-    queryKey: cryptoKeys.assetPlatforms(filter),
-    queryFn: () => getAssetPlatforms(filter),
-    staleTime: 24 * 60 * 60 * 1000, // Consider data stale after 24 hours
-  });
-}
