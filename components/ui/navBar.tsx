@@ -9,10 +9,57 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useSearch } from "@/lib/hooks/use-search"
+import { SearchResults } from "@/components/ui/search-results"
 
-export function Navbar() {
+export function Navbar({ onCoinSelect }: { onCoinSelect: (coinId: string) => void }) {
   const { searchQuery, setSearchQuery, results, loading, error, handleSearch } = useSearch();
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch(searchQuery);
+  };
+
+  const searchForm = (
+    <form onSubmit={handleSubmit} className="w-full max-w-sm lg:max-w-md xl:max-w-lg">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search cryptocurrencies..."
+          className="w-full bg-background pl-8 md:w-[300px] lg:w-[400px]"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSearch(searchQuery);
+            }
+          }}
+        />
+        <Button 
+          type="submit" 
+          variant="default" 
+          size="default" 
+          className="absolute right-0 top-0 h-full rounded-l-none"
+          onClick={() => handleSearch(searchQuery)}
+        >
+          Search
+        </Button>
+      </div>
+      <div className="relative">
+        <SearchResults 
+          results={results} 
+          isLoading={loading} 
+          onCoinSelect={onCoinSelect} 
+        />
+        {error && (
+          <div className="absolute w-full bg-destructive/10 text-destructive p-2 rounded-md mt-2">
+            {error}
+          </div>
+        )}
+      </div>
+    </form>
+  );
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,28 +84,9 @@ export function Navbar() {
           </Link>
         </nav>
 
-        {/* Search Bar - Grows on larger screens, hidden on mobile */}
+        {/* Desktop Search */}
         <div className="hidden md:flex flex-1 items-center justify-end">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch(searchQuery);
-          }} className="w-full max-w-sm lg:max-w-md xl:max-w-lg">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-full bg-background pl-8 md:w-[300px] lg:w-[400px]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (e.key === 'Enter') {
-                    handleSearch(searchQuery);
-                  }
-                }}
-              />
-            </div>
-          </form>
+          {searchForm}
         </div>
 
         {/* Mobile Search and Menu */}
@@ -71,26 +99,7 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="top" className="pt-16">
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                handleSearch(searchQuery);
-              }} className="w-full">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="w-full bg-background pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (e.key === 'Enter') {
-                        handleSearch(searchQuery);
-                      }
-                    }}
-                  />
-                </div>
-              </form>
+              {searchForm}
             </SheetContent>
           </Sheet>
 
@@ -120,23 +129,6 @@ export function Navbar() {
           </Sheet>
         </div>
       </div>
-    {/* Basic Search Results Display */}
-
-
-      {results.length > 0 && (
-        <div className="container mt-4">
-          <h2 className="text-lg font-semibold">Search Results</h2>
-          <ul>
-            {results.map((result) => (
-              <li key={result.id}>
-                <Link href={`/coins/${result.id}`}>
-                  <span>{result.name} ({result.symbol})</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </header>
   )
 }

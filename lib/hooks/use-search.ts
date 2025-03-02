@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import { CoinSearchResult } from '@/lib/api/searchApi';
+import { COINGECKO_CONFIG } from '../config/coingecko';
+
+interface SearchResult {
+  id: string;
+  name: string;
+  symbol: string;
+  market_cap_rank: number;
+  thumb: string;
+  large?: string;
+}
 
 export function useSearch() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [results, setResults] = useState<CoinSearchResult[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (query: string) => {
-    if (!query) {
+    if (!query.trim()) {
+      setResults([]);
       return;
     }
 
@@ -17,22 +27,27 @@ export function useSearch() {
 
     try {
       const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || 'An unknown error occurred');
-        setResults([]);
-        return;
+        throw new Error(data.error || 'Failed to fetch results');
       }
 
-      const data = await response.json();
-      setResults(data);
-    } catch (err: any) {
-      setError(err.message || 'An unknown error occurred');
+      setResults(data.coins || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
       setResults([]);
     } finally {
       setLoading(false);
     }
   };
 
-  return { searchQuery, setSearchQuery, results, loading, error, handleSearch };
+  return {
+    searchQuery,
+    setSearchQuery,
+    results,
+    loading,
+    error,
+    handleSearch,
+  };
 }
