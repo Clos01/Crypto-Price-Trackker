@@ -7,8 +7,8 @@ import Link from "next/link"
 import { Menu, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Input } from "@/components/ui/input"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -24,7 +24,7 @@ export function Navbar() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex items-center md:mr-6">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">Brand</span>
+            <span className="text-xl font-bold">crypto</span>
           </Link>
         </div>
 
