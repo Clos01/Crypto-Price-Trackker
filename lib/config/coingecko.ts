@@ -48,3 +48,11 @@ export type SupportedPlatform = typeof COINGECKO_CONFIG.SUPPORTED_PLATFORMS[numb
 
 // Type for token symbols
 export type TokenSymbol = keyof typeof COINGECKO_CONFIG.POPULAR_TOKEN_ADDRESSES;
+
+// Add a mapping for token names
+export const TOKEN_NAMES: Record<TokenSymbol, string> = {
+    'USDT': 'Tether',
+    'USDC': 'USD Coin',
+    'DAI': 'Dai',
+    'LINK': 'Chainlink'
+}

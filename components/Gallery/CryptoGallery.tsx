@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePopularTokenPrices } from "@/lib/hooks/use-crypto";
-import { COINGECKO_CONFIG, type TokenSymbol } from "@/lib/config/coingecko";
+import { COINGECKO_CONFIG, type TokenSymbol, TOKEN_NAMES } from "@/lib/config/coingecko";
 
 export function CryptoGallery() {
-  const { data: prices, isLoading, error } = usePopularTokenPrices(['usd'], true);
+  const { data: prices, isLoading, error, refetch } = usePopularTokenPrices(['usd'], true);
   const [retrying, setRetrying] = useState(false);
 
   const handleRetry = async () => {
@@ -20,11 +20,11 @@ export function CryptoGallery() {
 
   if (error) {
     return (
-      <Alert variant="destructive" className="mb-4">
-        <AlertDescription>
+      <Card className="mb-4 border-destructive text-destructive-foreground">
+        <CardContent>
           {error.message}
           {error.message.includes('Rate limit') && (
-            <button 
+            <button
               onClick={handleRetry}
               disabled={retrying}
               className="ml-2 underline"
@@ -32,8 +32,8 @@ export function CryptoGallery() {
               {retrying ? 'Retrying...' : 'Retry'}
             </button>
           )}
-        </AlertDescription>
-      </Alert>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -45,23 +45,23 @@ export function CryptoGallery() {
         const price = priceData?.[contractAddress]?.usd;
 
         return (
-          <Card key={tokenSymbol} className="hover:shadow-lg transition-shadow">
+          <Card key={tokenSymbol} className="hover:shadow-lg transition-shadow lg:w-2/3 md:w-2/3 sm:w-3/4 mx-auto">
             <CardHeader>
-              <CardTitle>{tokenSymbol}</CardTitle>
+              <CardTitle>{TOKEN_NAMES[tokenSymbol as TokenSymbol] || tokenSymbol} ({tokenSymbol})</CardTitle>
               <CardDescription>Current market price</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {price !== undefined ? (
-                  `$${price.toFixed(2)}`
-                ) : (
-                  'Price unavailable'
-                )}
-              </div>
-            </CardContent>
-          </Card>
+            <div className="text-2xl font-bold">
+              {price !== undefined ? (
+                `$${price.toFixed(2)}`
+              ) : (
+                'Price unavailable'
+              )}
+            </div>
+          </CardContent>
+        </Card>
         );
-      })}
-    </div>
-  );
+    })}
+  </div>
+);
 }
